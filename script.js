@@ -1,80 +1,46 @@
-body {
-  background: #222;
-  height: 100vh;
-  overflow: hidden;
-}
+const colors = ["rgb(0, 187, 249)", "rgb(0, 245, 323)", "rgb(252, 254, 255)"];
+const animations = ["fall-1", "fall-2", "fall-3"];
 
-.glow-point {
-  position: absolute;
-  box-shadow: 0rem 0rem 1.2rem 0.6rem rgb(239 42 201);
-  pointer-events: none;
-}
+const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+  selectRandom = (items) => items[rand(0, items.length - 1)];
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+const originPosition = { x: 0, y: 0 };
 
-.star {
-  position: absolute;
-  font-size: 1rem;
-  color: white;
+const last = {
+  starPosition: originPosition,
+  mousePosition: originPosition
+};
 
-  animation: fall 1500ms forwards;
-}
-@keyframes fall-1 {
-  0% {
-    transform: translate(0px, 0px) rotateX(45deg) rotateY(30deg) rotateZ(0deg)
-      scale(0.25);
-    opacity: 0;
+const calcDistance = (a, b) => {
+  const diffX = b.x - a.x,
+    diffY = b.y - a.y;
+
+  return Math.sqrt(Math.pow(diffX, 2) + Math.pow(diffY, 2));
+};
+
+window.onmousemove = (e) => {
+  const mouseX = e.clientX;
+  const mouseY = e.clientY;
+  const star = document.createElement("span");
+  star.className = "star fa-star fa-solid";
+  star.style.left = `${mouseX}px`;
+  star.style.top = `${mouseY}px`;
+  star.style.color = selectRandom(colors);
+  star.style.animationName = selectRandom(animations);
+
+  const glow = document.createElement("div");
+  glow.className = "glow-point";
+  glow.style.left = `${mouseX}px`;
+  glow.style.top = `${mouseY}px`;
+
+  last.mousePosition = { x: e.clientX, y: e.clientY };
+
+  document.body.appendChild(glow);
+  setTimeout(() => document.body.removeChild(glow), 75);
+
+  if (calcDistance(last.starPosition, last.mousePosition) >= 100) {
+    document.body.appendChild(star);
+    last.starPosition = last.mousePosition;
+    setTimeout(() => document.body.removeChild(star), 1500);
   }
-
-  5% {
-    transform: translate(10px, -10px) rotateX(45deg) rotateY(30deg)
-      rotateZ(0deg) scale(1);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(25px, 200px) rotateX(180deg) rotateY(270deg)
-      rotateZ(90deg) scale(1);
-    opacity: 0;
-  }
-}
-
-@keyframes fall-2 {
-  0% {
-    transform: translate(0px, 0px) rotateX(-20deg) rotateY(10deg) scale(0.25);
-    opacity: 0;
-  }
-
-  10% {
-    transform: translate(-10px, -5px) rotateX(-20deg) rotateY(10deg) scale(1);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(-10px, 160px) rotateX(-90deg) rotateY(45deg)
-      scale(0.25);
-    opacity: 0;
-  }
-}
-
-@keyframes fall-3 {
-  0% {
-    transform: translate(0px, 0px) rotateX(0deg) rotateY(45deg) scale(0.5);
-    opacity: 0;
-  }
-
-  15% {
-    transform: translate(7px, 5px) rotateX(0deg) rotateY(45deg) scale(1);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(20px, 120px) rotateX(-180deg) rotateY(-90deg)
-      scale(0.5);
-    opacity: 0;
-  }
-}
+};
